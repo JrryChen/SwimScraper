@@ -29,6 +29,107 @@ us_states = {
 	'Wyoming': 'WY'
 }
 
+regions = {
+	#Divisions
+	'All' : 'countryorganisation_usacollege',
+	'Division 1': 'division_1',
+	'Division 2': 'division_2',
+	'Division 3': 'division_3',
+	'NAIA': 'division_4',
+	'NJCAA': 'division_5',
+	'3C2A': 'division_6',
+	'Division 1 Mid-Major': 'division_9',
+	#Conferences
+	"Allegheny": "conference_147",
+    "America East": "conference_144",
+    "American Athletic": "conference_175",
+    "American Rivers": "conference_214",
+    "Appalachian Athletic": "conference_184",
+    "Appalachian Swim": "conference_177",
+    "Atlantic 10": "conference_2",
+    "ACC": "conference_3",
+    "Atlantic East": "conference_208",
+    "ASUN": "conference_32",
+    "Big East": "conference_4",
+    "Big Ten": "conference_6",
+    "Big West": "conference_5",
+    "Big 12": "conference_7",
+    "Bluegrass": "conference_31",
+    "Capital": "conference_34",
+    "Centennial": "conference_143",
+    "Chicagoland": "conference_207",
+    "CUNYAC": "conference_165",
+    "Coastal": "conference_8",
+    "CCIW": "conference_40",
+    "CCS": "conference_215",
+    "C-USA": "conference_9",
+    "Carolinas": "conference_205",
+    "ECAC": "conference_44",
+    "EISL": "conference_146",
+    "Empire 8": "conference_52",
+    "GLIAC": "conference_56",
+    "GLVC": "conference_169",
+    "GMAC": "conference_183",
+    "GNAC": "conference_167",
+    "Heartland": "conference_179",
+    "Horizon": "conference_10",
+    "Independent": "conference_11",
+    "Ivy": "conference_12",
+    "KCAC": "conference_212",
+    "Landmark": "conference_153",
+    "Liberal Arts": "conference_67",
+    "Liberty": "conference_181",
+    "Little East": "conference_210",
+    "MAAC": "conference_13",
+    "METS": "conference_70",
+    "MIAA": "conference_71",
+    "Mid-American": "conference_16",
+    "Mid-South": "conference_178",
+    "Middle Atlantic": "conference_160",
+    "Midwest": "conference_76",
+    "MIAC": "conference_77",
+    "Missouri Valley": "conference_17",
+    "Mountain East": "conference_204",
+    "MPSF": "conference_163",
+    "Mountain West": "conference_18",
+    "NEISDA": "conference_162",
+    "NESCAC": "conference_85",
+    "NEWMAC": "conference_86",
+    "NJAC": "conference_218",
+    "New South": "conference_88",
+    "NAC": "conference_213",
+    "North Coast": "conference_94",
+    "NEAC": "conference_180",
+    "Northeast 10": "conference_168",
+    "Northeast": "conference_19",
+    "Northern Sun": "conference_170",
+    "Northwest": "conference_96",
+    "Ohio": "conference_98",
+    "ODAC": "conference_100",
+    "PCSC": "conference_101",
+    "Pac 12": "conference_103",
+    "Patriot": "conference_131",
+    "PSAC": "conference_105",
+    "Presidents": "conference_106",
+    "Rocky Mountain Athletic Conference": "conference_161",
+    "Skyline": "conference_166",
+    "South Atlantic": "conference_217",
+    "SEC": "conference_22",
+    "SAA": "conference_176",
+    "SCIAC": "conference_115",
+    "SCAC": "conference_116",
+    "SUNYAC": "conference_120",
+    "Summit": "conference_14",
+    "SBC": "conference_23",
+    "Sunshine": "conference_164",
+    "Sun Conference": "conference_206",
+    "UNYSCSA": "conference_185",
+    "USA South": "conference_216",
+    "UAA": "conference_134",
+    "WAC": "conference_24",
+    "WIAC": "conference_133"
+}
+
 #HELPER FUNCTIONS -------------------------------------
 
 #changes name from (last, first) to (first last)
@@ -91,16 +192,16 @@ def getCity(hometown):
 
 #converts a time of the format minutes:seconds (1:53.8) to seconds (113.8)
 def convertTime(display_time):
-    if ':' in displayTime:
-        timeArray = displayTime.split(':')
+    if ':' in display_time:
+        timeArray = display_time.split(':')
         seconds = float(timeArray[0]) * 60
         seconds += float(timeArray[1])
 
         return seconds
-    elif displayTime.isalpha():
+    elif display_time.isalpha():
         pass
     else:
-        return float(displayTime)
+        return float(display_time)
 
 #for the header of an html table including events
 #returns a dictionary [meet_name_index, date_index, time_index]
@@ -352,9 +453,9 @@ def getSwimmerEvents(swimmer_ID):
 	swimmer_URL = 'https://www.swimcloud.com/swimmer/' + str(swimmer_ID) + '/'
 
 	# checks to see if the swimmer exists	
-	url = requests.get(swimmer_URl, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36', 'Referer' : 'https://google.com/'})
+	url = requests.get(swimmer_URL, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36', 'Referer' : 'https://google.com/'})
 	url.encoding = 'utf-8'
-	
+
 	if url.status_code == 404:
 		raise ValueError(f"The swimmer {swimmer_ID} was not found")
 	
@@ -773,6 +874,32 @@ def getProMeetResults(meet_ID, event_name, gender, event_ID = -1, event_href = '
 
 
 #--------- stil in progress ----------------
+
+#
+def getCollegeRankingsList(year, gender, event_name, event_ID='', region = "All"):
+	event_rankings = list()
+
+	if (gender != 'M' and gender != 'F'):
+		print('ERROR: need to input either M or F for gender')
+		return
+
+	if (event_ID == ''):
+		event_ID = events.get(event_name)
+	if (event_name == ''):
+		event_name = getEventName(event_ID)
+
+	season_ID = getSeasonID(year) # 2024-25 season is season_ID 28
+
+	region_ID = regions.get(region)
+
+	if region == 'NAIA':
+		ranking_url = ('https://www.swimcloud.com/country/usa/college/times/?dont_group=false' + f'&event={event_ID}' +
+					   '&event_course=Y' + f'&gender={gender}')
+	else:
+		ranking_url = ('https://www.swimcloud.com/country/usa/college/times/?dont_group=false' +
+				   f'&event={str(event_ID)}' + f'&gender={str(gender)}')
+
+
 
 #takes any number of teams as an input and returns the "simulated" results of the inputted event based on times from the specified year
 def getMeetSimulator(teams, gender, event_name, year = -1, event_ID = -1):

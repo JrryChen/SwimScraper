@@ -8,7 +8,7 @@ import time
 TEAM_PAGE_RANGE = 32
 
 states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DC", "DE", "FL", "GA", 
-          "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", 
+          "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
           "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", 
           "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", 
           "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
@@ -31,13 +31,13 @@ def getTeamList():
 		for team in teams:
 			team_info = team.find_all('a', attrs = {'class' : 'top-box-title'})[0] #contains the team's id # and the team's name
 
-			team_ID = team_info['href'].split('/')[-1] 
+			team_id = team_info['href'].split('/')[-1]
 			team_name = team_info.text.splitlines()[3]
 			team_state = team.find('div', attrs = {'class' : 'top-box-points'}).text.strip()
 
-			if(team_state in states): #currently only for colleges in the US - the teams from Canada do not have an about page
+			if team_state in states: #currently only for colleges in the US - the teams from Canada do not have an about page
 
-				team_url = 'https://www.swimcloud.com/team/' + team_ID + '/about/' #page that has division and conference information
+				team_url = 'https://www.swimcloud.com/team/' + team_id + '/about/' #page that has division and conference information
 
 				url = requests.get(team_url, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36', 'Referer' : 'https://google.com/'})
 
@@ -116,10 +116,10 @@ def getTeamList():
 					team_division_other = 'NONE'
 					team_division_other_ID = 'NONE'
 
-				team_list.append({'team_ID' : team_ID, 'team_name' : team_name, 'team_state' : team_state, 'team_division' : team_division, 'team_division_ID' : team_division_ID, 'team_division_other' : team_division_other, 'team_division_other_ID' : team_division_other_ID, 'team_conference' : team_conference, 'team_conference_ID' : team_conference_ID})
+				team_list.append({'team_id' : team_id, 'team_name' : team_name, 'team_state' : team_state, 'team_division' : team_division, 'team_division_ID' : team_division_ID, 'team_division_other' : team_division_other, 'team_division_other_ID' : team_division_other_ID, 'team_conference' : team_conference, 'team_conference_ID' : team_conference_ID})
 
 			else: #team is not in the US so set division and conference data to INTERNATIONAL
-				team_list.append({'team_ID' : team_ID, 'team_name' : team_name, 'team_state' : team_state, 'team_division' : 'INTERNATIONAL', 'team_division_ID' : 'INTERNATIONAL', 'team_division_other' : 'INTERNATIONAL', 'team_division_other_ID' : 'INTERNATIONAL', 'team_conference' : 'INTERNATIONAL', 'team_conference_ID' : 'INTERNATIONAL'})
+				team_list.append({'team_id' : team_id, 'team_name' : team_name, 'team_state' : team_state, 'team_division' : 'INTERNATIONAL', 'team_division_ID' : 'INTERNATIONAL', 'team_division_other' : 'INTERNATIONAL', 'team_division_other_ID' : 'INTERNATIONAL', 'team_conference' : 'INTERNATIONAL', 'team_conference_ID' : 'INTERNATIONAL'})
 
 
 
