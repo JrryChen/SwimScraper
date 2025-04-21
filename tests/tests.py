@@ -7,6 +7,16 @@ import pytest
 
 # TESTS ---------------------------------------------------------------------------------------------------------------------------
 
+# getCollegeRankingsList test
+def test_getCollegeRanking():
+    rankings_men_50_free_all = (ss.getCollegeRankings(year=2024, gender='M', event_name='50 Y Free'))
+    assert len(rankings_men_50_free_all) > 0
+    assert rankings_men_50_free_all[0]['swimmer_name'] == 'Jordan Crooks'
+
+    rankings_women_100_breast_NAIA = ss.getCollegeRankings(year=2021, gender='F', event_name = '100 Y Breast', region = 'NAIA')
+    assert len(rankings_women_100_breast_NAIA) > 0
+    assert rankings_women_100_breast_NAIA[1]['swimmer_name'] == 'Megan Schroeder'
+
 # currently just ensures getTeams returns something
 def test_getTeams():
     df = ss.getCollegeTeams(team_names = ['University of Pittsburgh', 'University of Louisville'])

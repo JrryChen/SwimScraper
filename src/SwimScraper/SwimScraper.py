@@ -3,6 +3,7 @@ import csv
 from bs4 import BeautifulSoup as bs
 import pandas as pd
 import time as _time
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,7 +17,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 teams = pd.read_csv('https://raw.githubusercontent.com/maflancer/SwimScraper/main/src/SwimScraper/collegeSwimmingTeams.csv')
 
-events = {'25 Y Free' : '125Y', '25 Y Back' : '225 Y', '25 Y Breast' : '325Y', '25 Y Fly' : '425Y', '50 Y Free' : '150Y', '75 Y Free' : '175Y', '100 Y Free' : '1100Y', '125 Y Free' : '1125Y', '200 Y Free' : '1200Y', '400 Y Free' : '1400Y', '500 Y Free' : '1500Y', '800 Y Free' : '1800Y', '1000 Y Free' : '11000Y', '1500 Y Free' : '11500Y', '1650 Y Free' : '11650Y', '50 Y Back' : '250Y', '100 Y Back': '2100Y', '200 Y Back' : '2200Y', '50 Y Breast' : '350Y', '100 Y Breast' : '3100Y', '200 Y Breast' : '3200Y', '50 Y Fly' : '450Y', '100 Y Fly' : '4100Y', '200 Y Fly' : '4200Y', '100 Y IM' : '5100Y', '200 Y IM' : '5200Y', '400 Y IM' : '5400Y', '200 Free Relay' : 6200, '400 Free Relay' : 6400, '800 Free Relay' : 6800, '200 Medley Relay' : 7200, '400 Medley Relay' : 7400, '1 M Diving' : 'H1', '1 M Diving (6 dives)' : 'H16', '3 M Diving ' : 'H3', '3 M Diving (6 dives)' : 'H36', '7M Diving' : 'H75', '7M Diving (5 dives)' : 'H75Y','Platform Diving' : 'H2', '50 Individual' : 'H50', '100 Individual' : 'H100', '200 Individual' : 'H200', 
+events = {'25 Y Free' : '125Y', '25 Y Back' : '225Y', '25 Y Breast' : '325Y', '25 Y Fly' : '425Y', '50 Y Free' : '150Y', '75 Y Free' : '175Y', '100 Y Free' : '1100Y', '125 Y Free' : '1125Y', '200 Y Free' : '1200Y', '400 Y Free' : '1400Y', '500 Y Free' : '1500Y', '800 Y Free' : '1800Y', '1000 Y Free' : '11000Y', '1500 Y Free' : '11500Y', '1650 Y Free' : '11650Y', '50 Y Back' : '250Y', '100 Y Back': '2100Y', '200 Y Back' : '2200Y', '50 Y Breast' : '350Y', '100 Y Breast' : '3100Y', '200 Y Breast' : '3200Y', '50 Y Fly' : '450Y', '100 Y Fly' : '4100Y', '200 Y Fly' : '4200Y', '100 Y IM' : '5100Y', '200 Y IM' : '5200Y', '400 Y IM' : '5400Y', '200 Free Relay' : 6200, '400 Free Relay' : 6400, '800 Free Relay' : 6800, '200 Medley Relay' : 7200, '400 Medley Relay' : 7400, '1 M Diving' : 'H1', '1 M Diving (6 dives)' : 'H16', '3 M Diving ' : 'H3', '3 M Diving (6 dives)' : 'H36', '7M Diving' : 'H75', '7M Diving (5 dives)' : 'H75Y','Platform Diving' : 'H2', '50 Individual' : 'H50', '100 Individual' : 'H100', '200 Individual' : 'H200',
 '25 S Free' : '125S', '25 S Back' : '225 S', '25 S Breast' : '325S', '25 S Fly' : '425S', '50 S Free' : '150S', '75 S Free' : '175S', '100 S Free' : '1100S', '125 S Free' : '1125S', '200 S Free' : '1200S', '400 S Free' : '1400S', '500 S Free' : '1500S', '800 S Free' : '1800S', '1000 S Free' : '11000S', '1500 S Free' : '11500S', '1650 S Free' : '11650S', '50 S Back' : '250S', '100 S Back': '2100S', '200 S Back' : '2200S', '50 S Breast' : '350S', '100 S Breast' : '3100S', '200 S Breast' : '3200S', '50 S Fly' : '450S', '100 S Fly' : '4100S', '200 S Fly' : '4200S', '100 S IM' : '5100S', '200 S IM' : '5200S', '400 S IM' : '5400S',
 '50 L Free' : '150L', '100 L Free' : '1100L', '200 L Free' : '1200L', '400 L Free' : '1400L', '500 L Free' : '1500L', '800 L Free' : '1800L', '1000 L Free' : '11000L', '1500 L Free' : '11500L', '1650 L Free' : '11650L', '50 L Back' : '250L', '100 L Back': '2100L', '200 L Back' : '2200L', '50 L Breast' : '350L', '100 L Breast' : '3100L', '200 L Breast' : '3200L', '50 L Fly' : '450L', '100 L Fly' : '4100L', '200 L Fly' : '4200L', '100 L IM' : '5100L', '200 L IM' : '5200L', '400 L IM' : '5400L'}
 
@@ -41,94 +42,104 @@ regions = {
 	'Division 1 Mid-Major': 'division_9',
 	#Conferences
 	"Allegheny": "conference_147",
-    "America East": "conference_144",
-    "American Athletic": "conference_175",
-    "American Rivers": "conference_214",
-    "Appalachian Athletic": "conference_184",
-    "Appalachian Swim": "conference_177",
-    "Atlantic 10": "conference_2",
-    "ACC": "conference_3",
-    "Atlantic East": "conference_208",
-    "ASUN": "conference_32",
-    "Big East": "conference_4",
-    "Big Ten": "conference_6",
-    "Big West": "conference_5",
-    "Big 12": "conference_7",
-    "Bluegrass": "conference_31",
-    "Capital": "conference_34",
-    "Centennial": "conference_143",
-    "Chicagoland": "conference_207",
-    "CUNYAC": "conference_165",
-    "Coastal": "conference_8",
-    "CCIW": "conference_40",
-    "CCS": "conference_215",
-    "C-USA": "conference_9",
-    "Carolinas": "conference_205",
-    "ECAC": "conference_44",
-    "EISL": "conference_146",
-    "Empire 8": "conference_52",
-    "GLIAC": "conference_56",
-    "GLVC": "conference_169",
-    "GMAC": "conference_183",
-    "GNAC": "conference_167",
-    "Heartland": "conference_179",
-    "Horizon": "conference_10",
-    "Independent": "conference_11",
-    "Ivy": "conference_12",
-    "KCAC": "conference_212",
-    "Landmark": "conference_153",
-    "Liberal Arts": "conference_67",
-    "Liberty": "conference_181",
-    "Little East": "conference_210",
-    "MAAC": "conference_13",
-    "METS": "conference_70",
-    "MIAA": "conference_71",
-    "Mid-American": "conference_16",
-    "Mid-South": "conference_178",
-    "Middle Atlantic": "conference_160",
-    "Midwest": "conference_76",
-    "MIAC": "conference_77",
-    "Missouri Valley": "conference_17",
-    "Mountain East": "conference_204",
-    "MPSF": "conference_163",
-    "Mountain West": "conference_18",
-    "NEISDA": "conference_162",
-    "NESCAC": "conference_85",
-    "NEWMAC": "conference_86",
-    "NJAC": "conference_218",
-    "New South": "conference_88",
-    "NAC": "conference_213",
-    "North Coast": "conference_94",
-    "NEAC": "conference_180",
-    "Northeast 10": "conference_168",
-    "Northeast": "conference_19",
-    "Northern Sun": "conference_170",
-    "Northwest": "conference_96",
-    "Ohio": "conference_98",
-    "ODAC": "conference_100",
-    "PCSC": "conference_101",
-    "Pac 12": "conference_103",
-    "Patriot": "conference_131",
-    "PSAC": "conference_105",
-    "Presidents": "conference_106",
-    "Rocky Mountain Athletic Conference": "conference_161",
-    "Skyline": "conference_166",
-    "South Atlantic": "conference_217",
-    "SEC": "conference_22",
-    "SAA": "conference_176",
-    "SCIAC": "conference_115",
-    "SCAC": "conference_116",
-    "SUNYAC": "conference_120",
-    "Summit": "conference_14",
-    "SBC": "conference_23",
-    "Sunshine": "conference_164",
-    "Sun Conference": "conference_206",
-    "UNYSCSA": "conference_185",
-    "USA South": "conference_216",
-    "UAA": "conference_134",
-    "WAC": "conference_24",
-    "WIAC": "conference_133"
+	"America East": "conference_144",
+	"American Athletic": "conference_175",
+	"American Rivers": "conference_214",
+	"Appalachian Athletic": "conference_184",
+	"Appalachian Swim": "conference_177",
+	"Atlantic 10": "conference_2",
+	"ACC": "conference_3",
+	"Atlantic East": "conference_208",
+	"ASUN": "conference_32",
+	"Big East": "conference_4",
+	"Big Ten": "conference_6",
+	"Big West": "conference_5",
+	"Big 12": "conference_7",
+	"Bluegrass": "conference_31",
+	"Capital": "conference_34",
+	"Centennial": "conference_143",
+	"Chicagoland": "conference_207",
+	"CUNYAC": "conference_165",
+	"Coastal": "conference_8",
+	"CCIW": "conference_40",
+	"CCS": "conference_215",
+	"C-USA": "conference_9",
+	"Carolinas": "conference_205",
+	"ECAC": "conference_44",
+	"EISL": "conference_146",
+	"Empire 8": "conference_52",
+	"GLIAC": "conference_56",
+	"GLVC": "conference_169",
+	"GMAC": "conference_183",
+	"GNAC": "conference_167",
+	"Heartland": "conference_179",
+	"Horizon": "conference_10",
+	"Independent": "conference_11",
+	"Ivy": "conference_12",
+	"KCAC": "conference_212",
+	"Landmark": "conference_153",
+	"Liberal Arts": "conference_67",
+	"Liberty": "conference_181",
+	"Little East": "conference_210",
+	"MAAC": "conference_13",
+	"METS": "conference_70",
+	"MIAA": "conference_71",
+	"Mid-American": "conference_16",
+	"Mid-South": "conference_178",
+	"Middle Atlantic": "conference_160",
+	"Midwest": "conference_76",
+	"MIAC": "conference_77",
+	"Missouri Valley": "conference_17",
+	"Mountain East": "conference_204",
+	"MPSF": "conference_163",
+	"Mountain West": "conference_18",
+	"NEISDA": "conference_162",
+	"NESCAC": "conference_85",
+	"NEWMAC": "conference_86",
+	"NJAC": "conference_218",
+	"New South": "conference_88",
+	"NAC": "conference_213",
+	"North Coast": "conference_94",
+	"NEAC": "conference_180",
+	"Northeast 10": "conference_168",
+	"Northeast": "conference_19",
+	"Northern Sun": "conference_170",
+	"Northwest": "conference_96",
+	"Ohio": "conference_98",
+	"ODAC": "conference_100",
+	"PCSC": "conference_101",
+	"Pac 12": "conference_103",
+	"Patriot": "conference_131",
+	"PSAC": "conference_105",
+	"Presidents": "conference_106",
+	"Rocky Mountain Athletic Conference": "conference_161",
+	"Skyline": "conference_166",
+	"South Atlantic": "conference_217",
+	"SEC": "conference_22",
+	"SAA": "conference_176",
+	"SCIAC": "conference_115",
+	"SCAC": "conference_116",
+	"SUNYAC": "conference_120",
+	"Summit": "conference_14",
+	"SBC": "conference_23",
+	"Sunshine": "conference_164",
+	"Sun Conference": "conference_206",
+	"UNYSCSA": "conference_185",
+	"USA South": "conference_216",
+	"UAA": "conference_134",
+	"WAC": "conference_24",
+	"WIAC": "conference_133"
 }
+
+# Patch the buggy __del__ method to avoid the WinError 6
+def safe_del(self):
+	try:
+		if hasattr(self, 'service'):
+			self.quit()
+	except Exception:
+		pass
+
+uc.Chrome.__del__ = safe_del
 
 #HELPER FUNCTIONS -------------------------------------
 
@@ -152,12 +163,12 @@ def getTeamID(team_name):
 
 #gets corresponding team name for a specified team_ID
 def getTeamName(team_ID):
-    team_name = ''
+	team_name = ''
 
-    for index, row in teams.iterrows():
-        if row['team_ID'] == team_ID:
-            team_name = row['team_name']
-    return team_name
+	for index, row in teams.iterrows():
+		if row['team_ID'] == team_ID:
+			team_name = row['team_name']
+	return team_name
 
 #gets corresponding season ID for a specified year
 def getSeasonID(year):
@@ -165,10 +176,10 @@ def getSeasonID(year):
 
 #gets corresponding year for a specified season_ID
 def getYear(season_ID):
-    return season_ID + 1996
+	return season_ID + 1996
 
 def getEventName(event_ID):
-    return list(events.keys())[list(events.values()).index(event_ID)]
+	return list(events.keys())[list(events.values()).index(event_ID)]
 
 def getEventID(event_name):
 	return events.get(event_name)
@@ -192,16 +203,16 @@ def getCity(hometown):
 
 #converts a time of the format minutes:seconds (1:53.8) to seconds (113.8)
 def convertTime(display_time):
-    if ':' in display_time:
-        timeArray = display_time.split(':')
-        seconds = float(timeArray[0]) * 60
-        seconds += float(timeArray[1])
+	if ':' in display_time:
+		timeArray = display_time.split(':')
+		seconds = float(timeArray[0]) * 60
+		seconds += float(timeArray[1])
 
-        return seconds
-    elif display_time.isalpha():
-        pass
-    else:
-        return float(display_time)
+		return seconds
+	elif display_time.isalpha():
+		pass
+	else:
+		return float(display_time)
 
 #for the header of an html table including events
 #returns a dictionary [meet_name_index, date_index, time_index]
@@ -407,12 +418,12 @@ def getPowerIndex(swimmer_ID):
 
 	url = requests.get(swimmer_url, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36', 'Referer' : 'https://google.com/'})
 	url.encoding = 'utf-8'
-	
+
 	if url.status_code == 404:
 		raise ValueError(f"The swimmer {swimmer_ID} was not found")
 
 	soup = bs(url.text, 'html.parser')
-	
+
 
 	data_array = soup.find_all('li', {'class' : 'c-list-bar__item'}) # returns the container items containing headers for recruiting stats
 	for d in data_array:
@@ -430,7 +441,7 @@ def getPowerIndex(swimmer_ID):
 	name_soup = bs(name_url.text, 'html.parser')
 
 	swimmer_list = name_soup.find('tbody').find_all('tr')
-	
+
 	for swimmer in swimmer_list:
 		#check if this is the correct swimmer by looking to see if the link matches their id
 		name = swimmer.find(class_='u-text-semi')
@@ -452,18 +463,18 @@ def getSwimmerEvents(swimmer_ID):
 	events = []
 	swimmer_URL = 'https://www.swimcloud.com/swimmer/' + str(swimmer_ID) + '/'
 
-	# checks to see if the swimmer exists	
+	# checks to see if the swimmer exists
 	url = requests.get(swimmer_URL, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36', 'Referer' : 'https://google.com/'})
 	url.encoding = 'utf-8'
 
 	if url.status_code == 404:
 		raise ValueError(f"The swimmer {swimmer_ID} was not found")
-	
+
 	driver.get(swimmer_URL)
 
 	if url.status_code == 404:
 		raise ValueError(f"The swimmer {swimmer_ID} was not found")
-	
+
 	tabs = driver.find_elements(By.CSS_SELECTOR, 'li.c-tabs__item')
 
 	_time.sleep(1) #makes sure the event tab pops up on website
@@ -563,7 +574,7 @@ def getSwimmerTimes(swimmer_ID, event_name, event_ID = ''):
 
 			columns = header[0].find_all('th')
 			indexes = getIndexes(columns) #this function finds the correct indexes for the meet name, date, year, and improvement, as they are different for some swimmers
-			
+
 			for time in times:
 				data = time.find_all('td')
 
@@ -872,32 +883,116 @@ def getProMeetResults(meet_ID, event_name, gender, event_ID = -1, event_href = '
 	driver.close()
 	return results
 
+# Get NCAA Current rankings
+def getCollegeRankings(year, gender, event_name, event_ID='', region="All"):
+	options = uc.ChromeOptions()
+	options.add_argument("--disable-blink-features=AutomationControlled")
+	options.add_argument("--disable-gpu")
+	options.add_argument("--no-sandbox")
+	options.add_argument("--start-maximized")
+	options.add_argument(
+		"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.7049.42 Safari/537.36"
+	)
+	# Headless mode is optional — disable for debugging
+	# options.add_argument("--headless=new")
+
+	driver = uc.Chrome(version_main=135, options=options)
+	event_rankings = []
+
+	try:
+		if gender not in ('M', 'F'):
+			print('ERROR: need to input either M or F for gender')
+			return []
+
+		if event_ID == '':
+			event_ID = events.get(event_name)
+		if event_name == '':
+			event_name = getEventName(event_ID)
+
+		event_ID = event_ID.replace("Y", "")
+		season_ID = getSeasonID(year)
+		region_ID = regions.get(region)
+
+		base_url = (
+			f'https://www.swimcloud.com/country/usa/college/times/?dont_group=false&event={event_ID}'
+		)
+
+		if region == 'NAIA':
+			base_url += '&event_course=Y'
+
+		base_url += f'&gender={gender}&page=1&region={region_ID}&season_id={season_ID}&team_id&year'
+		print(base_url)
+		driver.get(base_url)
+		WebDriverWait(driver, 10).until(
+			EC.presence_of_element_located((By.CLASS_NAME, "js-gtm-region-sidebar"))
+		)
+		# Select the region dropdown
+		region_dropdown = Select(driver.find_element(By.CLASS_NAME, "js-gtm-region-sidebar"))
+		region_dropdown.select_by_value(region_ID)
+		_time.sleep(4)
+
+		for pageNum in range(1, 10):
+			# print(f"\n🔘 Scraping page {pageNum}")
+
+			if pageNum > 1:
+				try:
+					WebDriverWait(driver, 10).until(
+						EC.presence_of_element_located((By.CLASS_NAME, "c-pagination"))
+					)
+					page_button = WebDriverWait(driver, 10).until(
+						EC.element_to_be_clickable((
+							By.XPATH,
+							f"//button[@class='c-pagination__action' and text()='{pageNum}']"
+						))
+					)
+					page_button.click()
+					_time.sleep(4)
+				except Exception as e:
+					print(f"⚠️ Could not click page {pageNum}: {e}")
+					break
+
+			html = driver.page_source
+			soup = bs(html, 'html.parser')
+			table_container = soup.find('div', class_='c-table-clean--responsive')
+			if table_container is None:
+				print("⚠️ Table not found — possibly blocked or structure changed.")
+
+			rows = table_container.find_all('tr')[1:]
+			for row in rows:
+				try:
+					ranking = int(row.find('td', class_='c-table-clean__col-fit u-pr0 u-text-center').text.strip())
+					swimmer_link = row.find('td', class_='u-text-semi').find('a')
+					swimmer_name = swimmer_link.text.strip()
+					swimmer_ID = swimmer_link['href'].split('/')[-1]
+					team_element = row.find('td', class_='u-visible-print-table-cell hidden-xs u-text-center').find('a')
+					team_name = team_element['title']
+					team_ID = team_element['href'].split('/')[-1]
+					time_text = row.find('td', class_='u-text-semi u-text-end').find('a').text.strip()
+					time_val = convertTime(time_text)
+
+					event_rankings.append({
+						'ranking': ranking,
+						'swimmer_name': swimmer_name,
+						'swimmer_ID': swimmer_ID,
+						'team_name': team_name,
+						'team_ID': team_ID,
+						'event_name': event_name,
+						'time': time_val
+					})
+				except Exception as e:
+					print(f"❌ Error parsing row: {e}")
+					continue
+
+	finally:
+		try:
+			driver.quit()
+		except Exception as e:
+			print(f"🧹 Warning during driver.quit(): {e}")
+		del driver
+
+	return event_rankings
 
 #--------- stil in progress ----------------
-
-#
-def getCollegeRankingsList(year, gender, event_name, event_ID='', region = "All"):
-	event_rankings = list()
-
-	if (gender != 'M' and gender != 'F'):
-		print('ERROR: need to input either M or F for gender')
-		return
-
-	if (event_ID == ''):
-		event_ID = events.get(event_name)
-	if (event_name == ''):
-		event_name = getEventName(event_ID)
-
-	season_ID = getSeasonID(year) # 2024-25 season is season_ID 28
-
-	region_ID = regions.get(region)
-
-	if region == 'NAIA':
-		ranking_url = ('https://www.swimcloud.com/country/usa/college/times/?dont_group=false' + f'&event={event_ID}' +
-					   '&event_course=Y' + f'&gender={gender}')
-	else:
-		ranking_url = ('https://www.swimcloud.com/country/usa/college/times/?dont_group=false' +
-				   f'&event={str(event_ID)}' + f'&gender={str(gender)}')
 
 
 
